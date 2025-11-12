@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A6 Name Badge</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Google Font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f0f0; /* Light grey background for the browser view */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Define A6 size: 105mm x 148mm */
+        .badge-container {
+            width: 105mm;
+            height: 148mm;
+            position: relative;
+            background-size: contain; /* Ensures the entire image fits without cropping */
+            background-repeat: no-repeat;
+            background-position: center center;
+            /* Use the filename of your uploaded image */
+            background-image: url('https://42lsga5fit.ucarecd.net/7544f285-6b88-4c5b-a3d3-b40d8fc8e771/NametagTemplate2_page0002.jpg');
+            /* Fallback background in case image fails to load */
+            background-color: #ffffff; 
+            border: 1px dashed #ccc; /* Visible border in browser */
+            overflow: hidden; /* Ensure content doesn't spill */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .content-wrapper {
+            position: absolute;
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Adjust for element's own size */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* This centers the children horizontally */
+            gap: 12px; /* Space between elements */
+            padding: 0 10mm; /* 10mm padding on left/right */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
+        .name-field {
+            font-size: 26pt; /* Large font for name */
+            font-weight: 900; /* Extra bold */
+            color: #1a202c; /* Dark grey color */
+            text-align: center;
+            line-height: 1.2;
+            word-wrap: break-word;
+        }
+
+        .org-field {
+            font-size: 16pt; /* Slightly smaller for organisation */
+            font-weight: 700; /* Bold */
+            color: #2d3748; /* Medium grey */
+            text-align: center;
+            line-height: 1.3;
+            word-wrap: break-word;
+        }
+
+        .qr-code {
+            width: 35mm; /* Set a fixed size for the QR code */
+            height: 35mm;
+            margin-top: 5mm; /* Space above the QR code */
+        }
+        
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                background-color: #ffffff;
+                padding: 0;
+                margin: 0;
+            }
+
+            /* Force browser to print backgrounds and colors */
+            .badge-container {
+                -webkit-print-color-adjust: exact; /* For Chrome, Safari */
+                color-adjust: exact; /* Standard property */
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                /* Ensure it prints on a single page */
+                page-break-inside: avoid;
+                page-break-after: always;
+            }
+
+            /* Hide the print button and any other UI elements */
+            .print-button {
+                display: none !important;
+            }
+
+            /* Fix for Chrome adding its own margins */
+            @page {
+                size: A6;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- A6 Badge Container -->
+    <div class="badge-container">
+        
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            
+            <!-- Dynamic Name -->
+            <div id="name" class="name-field">
+                Your Name Here
+            </div>
+
+            <!-- Dynamic Organisation -->
+            <div id="organisation" class="org-field">
+                Your Organisation
+            </div>
+
+            <!-- Dynamic QR Code -->
+            <div id="qr" class="qr-code">
+                <!-- This img src will be set by JavaScript -->
+                <img id="qr-img" src="https://placehold.co/150x150/eee/ccc?text=QR+Code" alt="QR Code">
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Print button (hidden on print) -->
+    <button onclick="window.print()" class="print-button bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 mt-5">
+        Print Badge
+    </button>
+
+    <script>
+        // This script runs when the page loads
+        window.onload = function() {
+            // Get the URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Get data from URL parameters
+            // Example URL: .../A6_Name_Badge.html?name=Jane%20Doe&org=Water%20Institute&qr=https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=JaneDoe
+            
+            const name = urlParams.get('name');
+            const organisation = urlParams.get('org');
+            const qrCodeUrl = urlParams.get('qr');
+
+            // Get the HTML elements
+            const nameElement = document.getElementById('name');
+            const orgElement = document.getElementById('organisation');
+            const qrImgElement = document.getElementById('qr-img');
+
+            // Update the elements if data is provided in the URL
+            if (name) {
+                nameElement.textContent = name;
+            }
+
+            if (organisation) {
+                orgElement.textContent = organisation;
+            }
+
+            if (qrCodeUrl) {
+                // Set the src of the <img> tag to the provided QR code URL
+                qrImgElement.src = qrCodeUrl;
+                qrImgElement.alt = `QR Code for ${name}`;
+            } else {
+                // Optional: Use a placeholder if no QR URL is given
+                // You can also use a library like qrcode.js to generate one from a vCard string, etc.
+                // For now, it just shows the placeholder.
+            }
+        };
+    </script>
+
+</body>
+</html>
